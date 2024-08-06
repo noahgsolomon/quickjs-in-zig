@@ -6,29 +6,16 @@ pub fn build(b: *std.Build) void {
 
     const exe = b.addExecutable(.{
         .name = "zigjs",
-        .root_source_file = .{ .src_path = .{
-            .owner = b,
-            .sub_path = "src/main.zig",
-        } },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    exe.addIncludePath(.{ .src_path = .{
-        .owner = b,
-        .sub_path = "quickjs",
-    } });
-    exe.addLibraryPath(.{ .src_path = .{
-        .owner = b,
-        .sub_path = "quickjs",
-    } });
-    exe.linkSystemLibrary("quickjs");
-    exe.linkLibC();
+    exe.addIncludePath(b.path("quickjs"));
 
-    exe.addLibraryPath(.{ .src_path = .{
-        .owner = b,
-        .sub_path = "quickjs-libc.c",
-    } });
+    exe.addObjectFile(b.path("quickjs/libquickjs.a"));
+
+    exe.linkLibC();
 
     b.installArtifact(exe);
 
